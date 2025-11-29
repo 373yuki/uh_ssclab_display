@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Vertical Lab Dashboard</title>
+    <style>
+        /* --- 1. ベース設定 (Dark Mode & Vertical Layout) --- */
+        body {
+            margin: 0;
+            padding: 10px;
+            background-color: #000;
+            color: #fff;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            height: 100vh;
+            box-sizing: border-box;
+            overflow: hidden;
+            /* スクロール禁止 */
+
+            /* 縦並びのフレックスボックス */
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* --- 2. パネル共通デザイン --- */
+        .panel {
+            background: #1a1a1a;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* ラベル（左上の小さな文字） */
+        .label {
+            position: absolute;
+            top: 5px;
+            left: 8px;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.7);
+            background: rgba(0, 0, 0, 0.6);
+            padding: 2px 6px;
+            border-radius: 4px;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        /* --- 3. 各エリアのサイズ配分 --- */
+        /* 上段：カレンダー (40%) */
+        #zone-calendar {
+            flex: 3;
+        }
+
+        /* 中段：雨雲レーダー (35%) */
+        #zone-radar {
+            flex: 4;
+        }
+
+        /* 下段コンテナ (25%) -> さらに左右分割 */
+        #zone-bottom-container {
+            flex: 2;
+            display: flex;
+            gap: 15px;
+        }
+
+        /* 下段の左右パネル */
+        .bottom-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        /* --- 4. コンテンツごとの装飾 --- */
+        /* iframeのダークモード化 */
+        iframe.dark-mode {
+            width: 100%;
+            height: 100%;
+            border: none;
+            /* カレンダーの色反転ハック */
+            filter: invert(0.9) hue-rotate(180deg) contrast(0.9);
+        }
+
+        /* レーダーは見やすく調整 */
+        iframe.radar-view {
+            width: 100%;
+            height: 100%;
+            border: none;
+            filter: contrast(1.2) brightness(0.9);
+        }
+
+        /* 締切カウントダウン */
+        .days-left {
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: #ff5252;
+            line-height: 1;
+        }
+
+        .unit {
+            font-size: 1rem;
+            color: #aaa;
+        }
+
+        .deadline-date {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* バス情報 */
+        .next-bus {
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: #4caf50;
+            line-height: 1;
+        }
+
+        .sub-bus {
+            font-size: 1rem;
+            color: #aaa;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="panel" id="zone-calendar" style="padding:0; background: #000;">
+        <div class="label" style="z-index:99;">MESSAGE BOARD</div>
+
+        <iframe id="slide-frame" src="https://docs.google.com/presentation/d/e/2PACX-1vR2j5JBow7Qj-L2s2M_3Tiru5vzLNEuorTeQ3zlHNJFTfvIDJK1ha8ZIgphboZQjE6uxNdHZeZ5jMqJ/pubembed?start=true&loop=true&delayms=3000" frameborder="0" width="100%" height="100%" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true">
+        </iframe>
+    </div>
+
+    <!-- <div class="panel" id="zone-calendar">
+        <div class="label">SCHEDULE</div>
+        <iframe class="dark-mode" src="https://calendar.google.com/calendar/embed?src=uhminamilab%40gmail.com&ctz=Asia%2FTokyo&showTitle=0&showPrint=0&showTabs=0&showCalendars=0">
+        </iframe>
+    </div> -->
+
+    <div class="panel" id="zone-radar" style="padding: 0;">
+        <div class="label" style="z-index:99;">RAIN RADAR (Windy)</div>
+
+    <iframe width="100%" height="100%" src="https://embed.windy.com/embed2.html?lat=34.861&lon=134.664&detailLat=34.861&detailLon=134.664&width=650&height=450&zoom=11&level=surface&overlay=radar&product=radar&menu=&message=&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=default&metricTemp=default&radarRange=-1" frameborder="0" style="filter: brightness(0.9);">
+    </iframe>
+    </div>
+
+    <div id="zone-bottom-container">
+
+        <div class="panel bottom-panel">
+            <div class="label">次のバス発車時刻</div>
+            <div class="next-bus" id="bus-primary">--:--</div>
+            <div class="sub-bus" id="bus-secondary">Wait...</div>
+        </div>
+
+        <div class="panel bottom-panel">
+            <div class="label">卒論提出まで</div>
+            <div>
+                <span class="days-left" id="days">0</span>
+                <span class="unit">日</span>
+            </div>
+            <div class="deadline-date" id="deadline-display">Until 2026/01/31</div>
+        </div>
+
+    </div>
+
+    <script>
+        // ==========================================
+        // CONFIGURATION (設定エリア)
+        // ==========================================
+
+        // 1. 卒論締切日
+        const DEADLINE_DATE = new Date("2026-01-31T17:00:00");
+
+        // 2. バス時刻表 (HH:MM形式)
+        const BUS_TIMETABLE = [
+            "09:00", "09:30", "10:00", "12:00",
+            "17:00", "17:15", "17:30", "17:45",
+            "18:00", "18:20", "18:40", "19:00", "19:30", "20:00", "21:00"
+        ];
+
+        // ==========================================
+        // LOGIC (ロジックエリア)
+        // ==========================================
+
+        function updateDashboard() {
+            const now = new Date();
+
+            // --- A. Count Down ---
+            const diff = DEADLINE_DATE - now;
+            if (diff > 0) {
+                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                document.getElementById("days").innerText = d;
+            } else {
+                document.getElementById("days").innerText = "0";
+            }
+
+            // --- B. Bus Schedule ---
+            const currentMins = now.getHours() * 60 + now.getMinutes();
+            // 未来のバスだけ抽出
+            const upcoming = BUS_TIMETABLE.filter(time => {
+                const [h, m] = time.split(":").map(Number);
+                return (h * 60 + m) > currentMins;
+            });
+
+            if (upcoming.length > 0) {
+                document.getElementById("bus-primary").innerText = upcoming[0];
+                document.getElementById("bus-secondary").innerText =
+                    upcoming.length > 1 ? `その次: ${upcoming[1]}` : "最終バスです";
+            } else {
+                document.getElementById("bus-primary").innerText = "終了";
+                document.getElementById("bus-secondary").innerText = "本日の運行は終了しました";
+            }
+        }
+
+        // --- C. Radar Auto Refresh (10 min) ---
+        setInterval(() => {
+            const frame = document.getElementById("radar-frame");
+            frame.src = frame.src; // Force reload
+            console.log("Radar Refreshed");
+        }, 10 * 60 * 1000);
+
+        // --- Init & Loop ---
+        document.getElementById("deadline-display").innerText =
+            `Until ${DEADLINE_DATE.toLocaleDateString()}`;
+
+        updateDashboard();
+        setInterval(updateDashboard, 1000); // 毎秒更新
+
+    </script>
+</body>
+</html>
