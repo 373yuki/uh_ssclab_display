@@ -53,8 +53,23 @@
 
         /* --- 3. 各エリアのサイズ配分 --- */
         /* 上段：カレンダー (40%) */
+
+        /* 上段を左右に並べる */
+        #zone-top-container {
+            flex: 3;              /* もともとの zone-calendar の高さをそのまま使用 */
+            display: flex;
+            gap: 15px;
+        }
+
+        /* 左右の比率（必要なら調整可） */
         #zone-calendar {
-            flex: 3;
+            flex: 3;              /* 伝言板を大きめに */
+        }
+
+        #zone-train {
+            flex: 2;              /* JR 運行情報は少し小さめ */
+            /* display: flex; */
+            flex-direction: row-reverse;
         }
 
         /* 中段：雨雲レーダー (35%) */
@@ -129,6 +144,19 @@
             color: #aaa;
             margin-top: 5px;
         }
+
+        /* JR運行情報パネル用 */
+        .jr-panel {
+            /* 既存 bottom-panel の上書き */
+            justify-content: flex-start;
+            align-items: stretch;
+        }
+
+        .jr-panel iframe.train-info {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
     </style>
 </head>
 <body>
@@ -152,11 +180,22 @@
 
     </div>
 
-    <div class="panel" id="zone-calendar" style="padding:0; background: #000;">
-        <div class="label" style="z-index:99;">伝言板（Googleスライドに記入）</div>
+    <div id="zone-top-container">
 
-        <iframe id="slide-frame" src="https://docs.google.com/presentation/d/e/2PACX-1vR2j5JBow7Qj-L2s2M_3Tiru5vzLNEuorTeQ3zlHNJFTfvIDJK1ha8ZIgphboZQjE6uxNdHZeZ5jMqJ/pubembed?start=true&loop=true&delayms=3000" frameborder="0" width="100%" height="100%" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true">
-        </iframe>
+        <!-- 左：伝言板（今の zone-calendar を移動） -->
+        <div class="panel" id="zone-calendar" style="padding:0; background: #000;">
+            <div class="label" style="z-index:99;">伝言板（Googleスライドに記入）</div>
+
+            <iframe id="slide-frame" src="https://docs.google.com/presentation/d/e/2PACX-1vR2j5JBow7Qj-L2s2M_3Tiru5vzLNEuorTeQ3zlHNJFTfvIDJK1ha8ZIgphboZQjE6uxNdHZeZ5jMqJ/pubembed?start=true&loop=true&delayms=3000" frameborder="0" width="100%" height="100%" allowfullscreen="true" mozallowfullscreen="true" webkitallowfullscreen="true">
+            </iframe>
+        </div>
+
+        <!-- ★ 右：JR運行情報パネル -->
+        <div class="panel jr-panel" id="zone-train">
+            <div class="label">JR運行情報</div>
+            <iframe class="train-info" src="https://www.train-guide.westjr.co.jp/kobesanyo.html?st=0450"></iframe>
+        </div>
+
     </div>
 
     <!-- <div class="panel" id="zone-calendar">
