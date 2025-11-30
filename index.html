@@ -127,6 +127,25 @@
 </head>
 <body>
 
+    <div id="zone-bottom-container">
+
+        <div class="panel bottom-panel">
+            <div class="label">次のバス発車時刻</div>
+            <div class="next-bus" id="bus-primary">--:--</div>
+            <div class="sub-bus" id="bus-secondary">Wait...</div>
+        </div>
+
+        <div class="panel bottom-panel">
+            <div class="label">卒論発表まで</div>
+            <div>
+                <span class="days-left" id="days">0</span>
+                <span class="unit">日</span>
+            </div>
+            <div class="deadline-date" id="deadline-display">Until 2026/02/19</div>
+        </div>
+
+    </div>
+
     <div class="panel" id="zone-calendar" style="padding:0; background: #000;">
         <div class="label" style="z-index:99;">伝言板（Googleスライドに記入）</div>
 
@@ -147,24 +166,9 @@
         </iframe>
     </div>
 
-    <div id="zone-bottom-container">
 
-        <div class="panel bottom-panel">
-            <div class="label">次のバス発車時刻</div>
-            <div class="next-bus" id="bus-primary">--:--</div>
-            <div class="sub-bus" id="bus-secondary">Wait...</div>
-        </div>
 
-        <div class="panel bottom-panel">
-            <div class="label">卒論発表まで</div>
-            <div>
-                <span class="days-left" id="days">0</span>
-                <span class="unit">日</span>
-            </div>
-            <div class="deadline-date" id="deadline-display">Until 2026/02/19</div>
-        </div>
 
-    </div>
 
     <script>
         // ==========================================
