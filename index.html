@@ -6,6 +6,9 @@
     <style>
         /* --- 1. ベース設定 (Dark Mode & Vertical Layout) --- */
         body {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
             margin: 0;
             padding: 10px;
             background-color: #000;
@@ -162,7 +165,7 @@
     <div class="panel" id="zone-radar" style="padding: 0;">
         <div class="label" style="z-index:99;">天気予報 (Windy)</div>
 
-        <iframe width="100%" height="100%" src="https://embed.windy.com/embed2.html?lat=34.861&lon=134.664&detailLat=34.861&detailLon=134.664&width=650&height=450&zoom=11&level=surface&overlay=rain&product=ecmwf&menu=&message=&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=default&metricTemp=default&radarRange=-1" frameborder="0" style="filter: brightness(0.9);">
+        <iframe id="radar-frame" width="100%" height="80%" src="https://embed.windy.com/embed2.html?lat=34.861&lon=134.664&detailLat=34.861&detailLon=134.664&width=650&height=450&zoom=11&level=surface&overlay=rain&product=ecmwf&menu=&message=&marker=&calendar=now&pressure=&type=map&location=coordinates&detail=&metricWind=default&metricTemp=default&radarRange=-1" frameborder="0" style="filter: brightness(0.9);">
         </iframe>
     </div>
 
