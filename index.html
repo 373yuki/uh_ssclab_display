@@ -283,6 +283,13 @@
             console.log("Radar Refreshed");
         }, 10 * 60 * 1000);
 
+        setInterval(() => {
+                const slideFrame = document.getElementById("slide-frame");
+                // srcを再代入することでiframeをリロードさせる
+                slideFrame.src = slideFrame.src;
+                console.log("Slide Refreshed");
+        }, 10 * 60 * 1000); // 15分 * 60秒 * 1000ミリ秒
+
         // --- Init & Loop ---
         document.getElementById("deadline-display").innerText =
             `Until ${DEADLINE_DATE.toLocaleDateString()}`;
