@@ -120,6 +120,10 @@
             line-height: 1;
         }
 
+        .days-left.overdue {
+            color: #ff9800; /* 過ぎた場合の色（オレンジ） */
+        }
+
         .unit {
             font-size: 1rem;
             color: #aaa;
@@ -170,12 +174,12 @@
         </div>
 
         <div class="panel bottom-panel">
-            <div class="label">卒論発表まで</div>
+            <div class="label">卒論完成まで</div>
             <div>
                 <span class="days-left" id="days">0</span>
                 <span class="unit">日</span>
             </div>
-            <div class="deadline-date" id="deadline-display">Until 2026/02/19</div>
+            <div class="deadline-date" id="deadline-display"></div>
         </div>
 
     </div>
@@ -221,7 +225,7 @@
         // ==========================================
 
         // 1. 卒論締切日
-        const DEADLINE_DATE = new Date("2026-02-19T09:00:00");
+        const DEADLINE_DATE = new Date("2027-01-31T09:00:00");
 
         // 2. バス時刻表 (HH:MM形式)
         const BUS_TIMETABLE = [
@@ -251,11 +255,18 @@
 
             // --- A. Count Down ---
             const diff = DEADLINE_DATE - now;
+            const d = Math.floor(Math.abs(diff) / (1000 * 60 * 60 * 24));
+            const daysElement = document.getElementById("days");
+            const unitElement = document.querySelector(".unit");
+
             if (diff > 0) {
-                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
-                document.getElementById("days").innerText = d;
+                daysElement.innerText = d;
+                unitElement.innerText = "日";
+                daysElement.classList.remove("overdue");
             } else {
-                document.getElementById("days").innerText = "0";
+                daysElement.innerText = d;
+                unitElement.innerText = "日過ぎ";
+                daysElement.classList.add("overdue");
             }
 
             // --- B. Bus Schedule ---
